@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Form, Input, Button } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import axios from 'axios'
+import {reqLogin} from '../../api'
 import logo from './images/logo.png'
 import './css/login.less'
 
@@ -10,14 +10,12 @@ const {Item} = Form
 export default class Login extends Component {
 
 	//表单提交且验证通过的回调
-	onFinish = values => {
-    axios.post('http://localhost:3000/login',`username=${values.username}&password=${values.password}`).then(
-			response => {console.log('成功了',response);},
-			error => {console.log('出错了',error);}
-		)
+	onFinish = async values => {
+		let result = await reqLogin(values)
+		console.log(result);
 	};
 
-	//密码的验证器（自定义校验）
+	//自定义校验
 	pwdValidator = (_,value="")=>{
 		let errMsgArr = []
 		if(!value.trim()) return Promise.reject('密码必须输入！')
@@ -37,7 +35,7 @@ export default class Login extends Component {
 				</header>
 				<section>
 					<span className="title">用户登录</span>
-
+					
 					<Form
 						className="login-form"
 						onFinish={this.onFinish} 
@@ -45,7 +43,7 @@ export default class Login extends Component {
 						<Item
 							name="username"
 							rules={[
-								{required:true,message:'用户名必须输入！'},
+								{required:true,message:'用户名必须输入！'}, 
 								{min:4,message:'用户名必须大于等于4位！'},
 								{max:12,message:'用户名必须小于等于12位！'},
 								{pattern:/^\w+$/,message:'用户名必须是英文、数字、下划线组成！'},
